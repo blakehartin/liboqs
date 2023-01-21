@@ -444,11 +444,23 @@ PQCLEAN_FALCON512_CLEAN_comp_decode(
                 return 0;
             }
         }
-        x[u] = (int16_t) m;
-        if (s) {
-            x[u] = (int16_t) - x[u];
-        }
-    }
+
+		/*
+		 * "-0" is forbidden.
+		 */
+		if (s && m == 0) {
+			return 0;
+		}
+
+		x[u] = (int16_t)(s ? -(int)m : (int)m);
+	}
+
+	/*
+	 * Unused bits in the last byte must be zero.
+	 */
+	if ((acc & ((1u << acc_len) - 1u)) != 0) {
+		return 0;
+	}
     return v;
 }
 
